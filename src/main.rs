@@ -1,6 +1,6 @@
 use clap::Parser;
 use dir;
-use std::{fs, path};
+use std::{fs, path, io};
 
 #[derive(Debug, Parser)]
 #[command(author = "Izaan Anwar", version = "1.0.0", about = "A Reycle Bin")]
@@ -44,6 +44,25 @@ fn create_garbage_dir() -> Result<String, std::io::Error> {
     }
 }
 
+fn remove_all_file(garbage_files_dir: &path::Path) -> Result<(), io::Error> {
+    if !garbage_files_dir.is_dir() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Not a valid directory path",
+        ));                
+    }
+    for entry in fs::read_dir(garbage_files_dir)? {
+        let entry = entry?; 
+        let entry_path = entry.path();
+
+        if entry_path.is_file() {
+            fs::remove_file(entry_path)?;
+        }
+    }
+    Ok(())
+
+}
+
 fn main() {
     match create_garbage_dir() {
         Ok(dir) => {
@@ -79,7 +98,16 @@ fn main() {
                         eprint!("Failed to delete the file: {}", e);
                     }
                 }
+            } else if cli.empty {
+                let garbage_files_dir = format!("{}/garbage/", dir);
+                let gfd = path::Path::new(&garbage_files_dir);
+                if let Err(e) = remove_all_file(gfd) {
+                    eprintln!("Error occurred while cleaning the bin: {}", e);
+                } else {
+                    eprintln!("Cleaned the bin.")
+                }
             }
+
         }
         Err(e) => {
             eprintln!("Error occurred: {}", e);
