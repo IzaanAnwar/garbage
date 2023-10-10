@@ -28,4 +28,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For questions, suggestions, or support, please feel free to contact us at [mdizaan67@gmail.com].
+For questions, suggestions, or support, please feel free to contact us at mdizaan67@gmail.com.
