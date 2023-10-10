@@ -1,6 +1,6 @@
 use clap::Parser;
 use dir;
-use std::{fs, path::{self, PathBuf}, io::{self, Write}, env};
+use std::{fs, path, io::{self, Write, BufRead}, env};
 
 #[derive(Debug, Parser)]
 #[command(author = "Izaan Anwar", version = "1.0.0", about = "A Reycle Bin")]
@@ -100,9 +100,57 @@ fn info_file_config(info_file: String, path: String) -> io::Result<()> {
     buf_writer.write_all(garbage_info.as_bytes())?;
     buf_writer.flush()?;
     Ok(())
-                            
+}
+
+fn restore_files(garbage_dir: String) -> Result<(), io::Error> {
+    let garbage_info_dir = format!("{}/garbageInfo", garbage_dir);
+    let current_dir = env::current_dir()?;
+
+    for entry in fs::read_dir(garbage_info_dir)? {
+        let entry = entry?;
+        let info_file = fs::File::open(entry.path())?;
+        let buf_reader = io::BufReader::new(info_file);
+
+        for line in buf_reader.lines() {
+            let line = line?;
+            if line.contains("Path=") {
+                let str_parts: Vec<&str> = line.split('=').collect();
+                let file_full_path = str_parts[1];
+                let (file_org_path, file_name) = match file_full_path.rfind('/') {
+                    Some(last_slash_idx ) => (&file_full_path[0..last_slash_idx], &file_full_path[(last_slash_idx + 1)..]),
+                    None => {
+                        return Err(io::Error::new(
+                            io::ErrorKind::InvalidInput,
+                            "Invalid input path",
+                        ));                    
+                    }                
+                };
+
+                if current_dir.to_str() == Some(file_org_path) {
+                    let file_to_restore = format!("{}/garbage/{}", garbage_dir, file_name);
+                    let loc_to_store = format!("{}/{}", file_org_path, file_name);
+                            println!("name: {}", &file_to_restore);
+                            println!("name: {}", &loc_to_store);
+                    match fs::rename(&file_to_restore, loc_to_store) {
+                        Ok(_) => {
+                            println!("name: {}, entery: {}", file_to_restore, entry.path().display());
+                            if let Err(e) = fs::remove_file(entry.path()) {
+                                return Err(e);
+                            }
+                        }
+                        Err(e) => {
+                            return Err(e);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    Ok(())
 
 }
+
 
 fn main() {
     match create_garbage_dir() {
@@ -144,8 +192,21 @@ fn main() {
                 } else {
                     eprintln!("Cleaned the bin.")
                 }
-            } 
+            } else if cli.restore {
+                println!("Restoring");
+                match restore_files(dir) {
+                    Ok(_) => {
+                        println!("Restored");
+                    }  
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                    }
+                };
+                                    
 
+
+            } 
+                
 
         }
         Err(e) => {
