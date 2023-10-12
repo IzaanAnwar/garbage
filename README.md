@@ -7,7 +7,15 @@ Garbage is a simple command-line tool for managing trashed files and directories
 To install Garbage, make sure you have Rust and Cargo (the Rust package manager) installed. Then run the following command:
 
 ```bash
-apt install garbage-cli
+git clone https://github.com/IzaanAnwar/garbage.git
+
+chmod +x install.sh
+
+source install.sh
+```
+# Package manager installation will be added in future
+```bash
+~~apt install garbage-cli~~ 
 ```
 
 # Usage

@@ -45,7 +45,6 @@ fn create_garbage_dir() -> Result<String, std::io::Error> {
 
             fs::create_dir(&garbage_dir.join("garbage"))?;
             fs::create_dir(&garbage_dir.join("garbageInfo"))?;
-            println!("Created 'garbage' directory at: {}", garbage_dir.display());
         }
         let garbage_dir_str = garbage_dir.to_str().ok_or_else(|| {
             std::io::Error::new(
@@ -129,11 +128,8 @@ fn restore_files(garbage_dir: String) -> Result<(), io::Error> {
                 if current_dir.to_str() == Some(file_org_path) {
                     let file_to_restore = format!("{}/garbage/{}", garbage_dir, file_name);
                     let loc_to_store = format!("{}/{}", file_org_path, file_name);
-                            println!("name: {}", &file_to_restore);
-                            println!("name: {}", &loc_to_store);
                     match fs::rename(&file_to_restore, loc_to_store) {
                         Ok(_) => {
-                            println!("name: {}, entery: {}", file_to_restore, entry.path().display());
                             if let Err(e) = fs::remove_file(entry.path()) {
                                 return Err(e);
                             }
@@ -168,7 +164,7 @@ fn main() {
                 let garbage_file = format!("{}/garbage/{}", dir, file);
                 println!("garbage location: {}", file);
                 if path::Path::new(&garbage_file).exists() {
-                    println!("file exists");
+                    println!("file with same name exists in garbage dirr\n [unsupported]");
                     return;
                 }
                 match fs::rename(&filename, &garbage_file) {
