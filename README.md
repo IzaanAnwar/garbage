@@ -14,9 +14,7 @@ chmod +x install.sh
 source install.sh
 ```
 # Package manager installation will be added in future
-```bash
 ~~apt install garbage-cli~~ 
-```
 
 # Usage
 
