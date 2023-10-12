@@ -9,14 +9,14 @@ To install Garbage, make sure you have Rust and Cargo (the Rust package manager)
 ```bash
 git clone https://github.com/IzaanAnwar/garbage.git
 
+cd garbage
+
 chmod +x install.sh
 
 source install.sh
 ```
 # Package manager installation will be added in future
-```bash
-~~apt install garbage-cli~~ 
-```
+~~apt install garbage~~ 
 
 # Usage
 
